@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.h.mapper.TFollowInfoMapper">
+  <resultMap id="BaseResultMap" type="com.h.entity.WxFollowInfo">
+    <id column="openid" jdbcType="VARCHAR" property="openid" />
+    <result column="follow_openid" jdbcType="VARCHAR" property="followOpenid" />
+    <result column="follow_time" jdbcType="TIMESTAMP" property="followTime" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    openid, follow_openid, follow_time
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from wx_follow_info
+    where openid = #{openid,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+    delete from wx_follow_info
+    where openid = #{openid,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.h.entity.WxFollowInfo">
+    insert into wx_follow_info (openid, follow_openid, follow_time
+      )
+    values (#{openid,jdbcType=VARCHAR}, #{followOpenid,jdbcType=VARCHAR}, #{followTime,jdbcType=TIMESTAMP}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.h.entity.WxFollowInfo">
+    REPLACE into wx_follow_info
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="openid != null">
+        openid,
+      </if>
+      <if test="followOpenid != null">
+        follow_openid,
+      </if>
+      <if test="followTime != null">
+        follow_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="openid != null">
+        #{openid,jdbcType=VARCHAR},
+      </if>
+      <if test="followOpenid != null">
+        #{followOpenid,jdbcType=VARCHAR},
+      </if>
+      <if test="followTime != null">
+        #{followTime,jdbcType=TIMESTAMP}
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.h.entity.WxFollowInfo">
+    update wx_follow_info
+    <set>
+      <if test="followOpenid != null">
+        follow_openid = #{followOpenid,jdbcType=VARCHAR},
+      </if>
+      <if test="followTime != null">
+        follow_time = #{followTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where openid = #{openid,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.h.entity.WxFollowInfo">
+    update wx_follow_info
+    set follow_openid = #{followOpenid,jdbcType=VARCHAR},
+      follow_time = #{followTime,jdbcType=TIMESTAMP}
+    where openid = #{openid,jdbcType=VARCHAR}
+  </update>
+
+  <select id="selectRankingList" resultType="com.h.entity.RankingItem">
+    SELECT user.nickname as nickname,
+           count( * ) AS count
+    FROM
+      wx_user
+      AS user
+    JOIN wx_follow_info AS follow
+    WHERE
+      user.openid = follow.openid
+    GROUP BY
+      user.nickname
+    ORDER BY
+      count DESC;
+  </select>
+
+  <select id="selectCountByOpenid" parameterType="java.lang.String" resultType="java.lang.Integer">
+    select count(*) from wx_follow_info where openid=#{openid,jdbcType=VARCHAR}
+  </select>
+</mapper>
